@@ -64,9 +64,9 @@ const keys = {
         KeyI: 'I',
         KeyO: 'O',
         KeyP: 'P',
-        BracketLeft: '[',
-        BracketRight: ']',
-        Backslash: '\\',
+        BracketLeft: '{',
+        BracketRight: '}',
+        Backslash: '|',
     },
     enKeyUpperCaseThirdRow: {
         KeyA: 'A',
@@ -78,8 +78,8 @@ const keys = {
         KeyJ: 'J',
         KeyK: 'K',
         KeyL: 'L',
-        Semicolon: ';',
-        Quote: "'",
+        Semicolon: ':',
+        Quote: '""',
     },
     enKeyUpperCaseFourthRow: {
         KeyZ: 'Z',
@@ -89,9 +89,9 @@ const keys = {
         KeyB: 'B',
         KeyN: 'N',
         KeyM: 'M',
-        Comma: ',',
-        Period: '.',
-        Slash: '/',
+        Comma: '<',
+        Period: '>',
+        Slash: '?',
     },
     ruKeyLowerCaseSecondRow: {
         KeyQ: 'й',
@@ -146,7 +146,7 @@ const keys = {
         KeyP: 'З',
         BracketLeft: 'Х',
         BracketRight: 'Ъ',
-        Backslash: '\\',
+        Backslash: '/',
     },
     ruKeyUpperCaseThirdRow: {
         KeyA: 'Ф',
@@ -171,7 +171,7 @@ const keys = {
         KeyM: 'Ь',
         Comma: 'Б',
         Period: 'Ю',
-        Slash: '.',
+        Slash: ',',
     }
 };
 
@@ -180,6 +180,7 @@ const keysForShortcuts = ['ControlLeft', 'ControlRight', 'ShiftLeft', 'ShiftRigh
 
 const textarea = document.querySelector('.textarea');
 const keyboardContainer = document.querySelector('.keyboard-container');
+let textareaText = [];
 
 // функция для формирования строк --------------------------------------------------------------------
 const getRows = (theObject, className) => {
@@ -250,7 +251,17 @@ const keyUpEvent = (event) => {
 
     // вывод текста в textarea, РАЗОБРАТЬСЯ С КУРСОРОМ
     if (event && !keysNotForPrint.includes(event.code)) {
-        textarea.textContent += event.key;
+        textareaText.push(event.key);
+        textarea.textContent = textareaText.join('');
+        // textarea.textContent += event.key;
+    }
+
+    //ПОДУМАТЬ
+    console.log(event.code);
+    if (document.querySelector('#CapsLock').classList.contains('active')) {
+        whatLangToUpper(language);
+    } else {
+        whatLang(language);
     }
 }
 
@@ -260,16 +271,17 @@ document.addEventListener('keyup', keyUpEvent);
 // вывод текста при нажатии на кнопки --------------------------------------------------------------------
 const printText = (event) => {
     if (event && !keysNotForPrint.includes(event.target.id)) {
-        textarea.textContent += event.target.innerText;
+        textareaText.push(event.target.innerText);
+        // textarea.textContent += event.target.innerText;
     }
     if (event.target.id === 'Space') {
-        textarea.textContent += ' ';
+        textareaText.push(' ');
+        // textarea.textContent += ' ';
     }
+    textarea.textContent = textareaText.join('');
 }
 
 keyboardContainer.addEventListener('click', printText);
-
-//const keysForShortcuts = ['ControlLeft', 'ControlRight', 'ShiftLeft', 'ShiftRight', 'AltLeft', 'AltRight', 'CapsLock'];
 
 // залипание/отлипание shift, ctrl, alt, caps
 
@@ -297,16 +309,12 @@ const shiftPress = (event) => {
         whatLang(language);
     }
 
-    if (event.target.id === 'ShiftLeft') {
-        document.querySelector('#ShiftLeft').classList.toggle('active');
-        if (document.querySelector('#ShiftLeft').classList.contains('active')) {
+    if (event.target.id === 'ShiftLeft' || event.target.id === 'ShiftRight') {
+        document.querySelector(`#${event.target.id}`).classList.toggle('active');
+        if (document.querySelector(`#${event.target.id}`).classList.contains('active')) {
             whatLangToUpper(language);
-        }
-    }
-    if (event.target.id === 'ShiftRight') {
-        document.querySelector('#ShiftRight').classList.toggle('active');
-        if (document.querySelector('#ShiftRight').classList.contains('active')) {
-            whatLangToUpper(language);
+        } else {
+            whatLang(language);
         }
     }
 }
@@ -323,9 +331,28 @@ const capsPress = (event) => {
     }
 }
 
+const enterPress = (event) => {
+    if (event.target.id === 'Enter') {
+        textareaText.push('\n');
+        // textarea.textContent += '\n';
+    }
+}
+
+// const keysNotForPrint = ['ControlLeft', 'ControlRight', 'ShiftLeft', 'ShiftRight', 'AltLeft', 'AltRight', 'CapsLock', 'Tab', 'Backspace', 'Enter', 'Delete', 'ArrowUp', 'ArrowLeft', 'ArrowRight', 'ArrowDown'];
+const BackspacePress = (event) => {
+    if (event.target.id === 'Backspace') {
+        console.log(textareaText.length);
+        textareaText.pop();
+    }
+}
+
+//const keysForShortcuts = ['ControlLeft', 'ControlRight', 'ShiftLeft', 'ShiftRight', 'AltLeft', 'AltRight', 'CapsLock'];
+
 keyboardContainer.addEventListener('click', getKeysForShortcuts);
 keyboardContainer.addEventListener('click', shiftPress);
 keyboardContainer.addEventListener('click', capsPress);
+keyboardContainer.addEventListener('click', enterPress);
+keyboardContainer.addEventListener('click', BackspacePress);
 
 
 
