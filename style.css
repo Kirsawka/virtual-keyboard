@@ -84,3 +84,7 @@
 .active {
     background-color: lightgrey;
 }
+
+.keyboard-btn:active {
+    background-color: lightgrey;
+}
