@@ -54,7 +54,7 @@
     align-items: center;
     cursor: pointer;
     border-radius: 5px;
-    /*box-shadow: 1px 2px 3px #ccc;*/
+    box-shadow: 1px 1px 2px grey;
 }
 
 .keyboard-btn.backquote {
@@ -83,8 +83,14 @@
 
 .active {
     background-color: lightgrey;
+    top: 1px;
+    left: 1px;
+    box-shadow: none;
 }
 
 .keyboard-btn:active {
-    background-color: lightgrey;
+    position: relative;
+    top: 1px;
+    left: 1px;
+    box-shadow: none;
 }

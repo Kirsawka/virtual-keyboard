@@ -53,7 +53,21 @@ const keys = {
         Period: '.',
         Slash: '/',
     },
-    enKeyUpperCaseSecondRow: {
+    enKeyUpperCaseFirstRow: {
+        Digit1: '!',
+        Digit2: '@',
+        Digit3: '#',
+        Digit4: '$',
+        Digit5: '%',
+        Digit6: '^',
+        Digit7: '&',
+        Digit8: '*',
+        Digit9: '(',
+        Digit0: ')',
+        Minus: '_',
+        Equal: '+',
+    },
+enKeyUpperCaseSecondRow: {
         KeyQ: 'Q',
         KeyW: 'W',
         KeyE: 'E',
@@ -133,6 +147,20 @@ const keys = {
         Period: 'ю',
         Slash: '.',
     },
+    ruKeyUpperCaseFirstRow: {
+        Digit1: '!',
+        Digit2: '"',
+        Digit3: '№',
+        Digit4: ';',
+        Digit5: '%',
+        Digit6: ':',
+        Digit7: '?',
+        Digit8: '*',
+        Digit9: '(',
+        Digit0: ')',
+        Minus: '_',
+        Equal: '+',
+    },
     ruKeyUpperCaseSecondRow: {
         KeyQ: 'Й',
         KeyW: 'Ц',
@@ -200,11 +228,13 @@ const whatLang = (language) => {
         getRows(keys.enKeyLowerCaseSecondRow, 'second-row');
         getRows(keys.enKeyLowerCaseThirdRow, 'third-row');
         getRows(keys.enKeyLowerCaseFourthRow, 'fourth-row');
+        document.querySelector('#Backquote').textContent = '`';
     } else {
         getRows(keys.enKeyLowerCaseFirstRow, 'first-row');
         getRows(keys.ruKeyLowerCaseSecondRow, 'second-row');
         getRows(keys.ruKeyLowerCaseThirdRow, 'third-row');
         getRows(keys.ruKeyLowerCaseFourthRow, 'fourth-row');
+        document.querySelector('#Backquote').textContent = 'ё';
     }
 }
 
@@ -212,15 +242,17 @@ whatLang(language);
 
 const whatLangToUpper = (language) => {
     if (language === 'en') {
-        getRows(keys.enKeyLowerCaseFirstRow, 'first-row');
+        getRows(keys.enKeyUpperCaseFirstRow, 'first-row');
         getRows(keys.enKeyUpperCaseSecondRow, 'second-row');
         getRows(keys.enKeyUpperCaseThirdRow, 'third-row');
         getRows(keys.enKeyUpperCaseFourthRow, 'fourth-row');
+        document.querySelector('#Backquote').textContent = '~';
     } else {
-        getRows(keys.enKeyLowerCaseFirstRow, 'first-row');
+        getRows(keys.ruKeyUpperCaseFirstRow, 'first-row');
         getRows(keys.ruKeyUpperCaseSecondRow, 'second-row');
         getRows(keys.ruKeyUpperCaseThirdRow, 'third-row');
         getRows(keys.ruKeyUpperCaseFourthRow, 'fourth-row');
+        document.querySelector('#Backquote').textContent = 'Ё';
     }
 }
 
@@ -346,6 +378,41 @@ const BackspacePress = (event) => {
     }
 }
 
+const tabPress = (event) => {
+    if (event.target.id === 'Tab') {
+        textareaText.push('  ');
+    }
+}
+let strForLang = '';
+const changeLang = (event) => {
+    if (event.target.id === 'ControlLeft' ||
+        event.target.id === 'AltLeft' ||
+        event.target.id === 'ControlRight' ||
+        event.target.id === 'AltRight') {
+        strForLang += event.target.id;
+    } else {
+        strForLang = '';
+    }
+    switch (strForLang) {
+        case 'ControlLeftAltLeft':
+        case 'AltLeftControlLeft':
+        case 'ControlRightAltRight':
+        case 'AltRightControlRight':
+        case 'ControlLeftAltRight':
+        case 'ControlRightAltLeft':
+        case 'AltLeftControlRight':
+        case 'AltRightControlLeft':
+            strForLang = '';
+            language = (language === 'en') ? 'ru' : 'en';
+            localStorage['language'] = language;
+            whatLang(language);
+            document.querySelector('#ControlLeft').classList.remove('active');
+            document.querySelector('#ControlRight').classList.remove('active');
+            document.querySelector('#AltLeft').classList.remove('active');
+            document.querySelector('#AltRight').classList.remove('active');
+    }
+}
+
 //const keysForShortcuts = ['ControlLeft', 'ControlRight', 'ShiftLeft', 'ShiftRight', 'AltLeft', 'AltRight', 'CapsLock'];
 
 keyboardContainer.addEventListener('click', getKeysForShortcuts);
@@ -353,10 +420,7 @@ keyboardContainer.addEventListener('click', shiftPress);
 keyboardContainer.addEventListener('click', capsPress);
 keyboardContainer.addEventListener('click', enterPress);
 keyboardContainer.addEventListener('click', BackspacePress);
-
-
-
-
-
+keyboardContainer.addEventListener('click', tabPress);
+keyboardContainer.addEventListener('click', changeLang);
 
 
