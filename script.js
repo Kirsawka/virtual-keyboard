@@ -66,7 +66,7 @@ keyboardLine5.insertAdjacentHTML('afterbegin', '<div class="keyboard-btn ctrl" i
 keyboardContainerTag.insertAdjacentHTML('afterend', '<p class="description">Для переключения языка комбинация: левыe shift + alt.</p>');
 keyboardContainerTag.insertAdjacentHTML('afterend', '<p class="description">Клавиатура создана в операционной системе Windows.</p>');
 
-const keysNotForKeyboardPrint = ['ControlLeft', 'ControlRight', 'ShiftLeft', 'ShiftRight', 'AltLeft', 'AltRight', 'CapsLock', 'Tab', 'Backspace', 'Enter', 'Delete', 'ArrowUp', 'ArrowLeft', 'ArrowRight', 'ArrowDown'];
+const keysNotForKeyboardPrint = ['ControlLeft', 'ControlRight', 'ShiftLeft', 'ShiftRight', 'AltLeft', 'AltRight', 'CapsLock', 'Tab', 'Backspace', 'Enter', 'Delete'];
 const keysNotForPrint = ['ControlLeft', 'ControlRight', 'ShiftLeft', 'ShiftRight', 'AltLeft', 'AltRight', 'CapsLock', 'Tab', 'Backspace', 'Enter', 'Delete'];
 const keysForShortcuts = ['ControlLeft', 'ControlRight', 'ShiftLeft', 'ShiftRight', 'AltLeft', 'AltRight', 'CapsLock'];
 
