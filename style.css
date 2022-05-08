@@ -95,3 +95,9 @@
     left: 1px;
     box-shadow: none;
 }
+
+.description {
+    text-align: center;
+    font-size: 25px;
+    margin: 20px;
+}
