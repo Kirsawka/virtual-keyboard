@@ -55,6 +55,8 @@
     cursor: pointer;
     border-radius: 5px;
     box-shadow: 1px 1px 2px grey;
+    user-select: none;
+    position: relative;
 }
 
 .keyboard-btn.backquote {
@@ -89,7 +91,6 @@
 }
 
 .keyboard-btn:active {
-    position: relative;
     top: 1px;
     left: 1px;
     box-shadow: none;

@@ -67,7 +67,7 @@ const keys = {
         Minus: '_',
         Equal: '+',
     },
-enKeyUpperCaseSecondRow: {
+    enKeyUpperCaseSecondRow: {
         KeyQ: 'Q',
         KeyW: 'W',
         KeyE: 'E',
@@ -203,14 +203,16 @@ enKeyUpperCaseSecondRow: {
     }
 };
 
-const keysNotForPrint = ['ControlLeft', 'ControlRight', 'ShiftLeft', 'ShiftRight', 'AltLeft', 'AltRight', 'CapsLock', 'Tab', 'Backspace', 'Enter', 'Delete', 'ArrowUp', 'ArrowLeft', 'ArrowRight', 'ArrowDown'];
+const keysNotForKeyboardPrint = ['ControlLeft', 'ControlRight', 'ShiftLeft', 'ShiftRight', 'AltLeft', 'AltRight', 'CapsLock', 'Tab', 'Backspace', 'Enter', 'Delete', 'ArrowUp', 'ArrowLeft', 'ArrowRight', 'ArrowDown'];
+const keysNotForPrint = ['ControlLeft', 'ControlRight', 'ShiftLeft', 'ShiftRight', 'AltLeft', 'AltRight', 'CapsLock', 'Tab', 'Backspace', 'Enter', 'Delete'];
 const keysForShortcuts = ['ControlLeft', 'ControlRight', 'ShiftLeft', 'ShiftRight', 'AltLeft', 'AltRight', 'CapsLock'];
 
 const textarea = document.querySelector('.textarea');
 const keyboardContainer = document.querySelector('.keyboard-container');
 let textareaText = [];
+let strForLang = '';
 
-// функция для формирования строк --------------------------------------------------------------------
+// функция для формирования строк ------------------------------------------------------------------------------РАБОТАЕТ
 const getRows = (theObject, className) => {
     let row = '';
     for (let key in theObject) {
@@ -219,10 +221,10 @@ const getRows = (theObject, className) => {
     document.querySelector(`.${className}`).innerHTML = row;
 }
 
-// вывод строк в зависимости от языка в LocalStorage --------------------------------------------------------------------
+// вывод строк в зависимости от языка в LocalStorage -----------------------------------------------------------РАБОТАЕТ
 let language = localStorage.getItem('language') ? localStorage.getItem('language') : 'en';
 
-const whatLang = (language) => {
+const outputLowerCase = (language) => {
     if (language === 'en') {
         getRows(keys.enKeyLowerCaseFirstRow, 'first-row');
         getRows(keys.enKeyLowerCaseSecondRow, 'second-row');
@@ -238,9 +240,9 @@ const whatLang = (language) => {
     }
 }
 
-whatLang(language);
+outputLowerCase(language);
 
-const whatLangToUpper = (language) => {
+const outputUpperCase = (language) => {
     if (language === 'en') {
         getRows(keys.enKeyUpperCaseFirstRow, 'first-row');
         getRows(keys.enKeyUpperCaseSecondRow, 'second-row');
@@ -256,171 +258,214 @@ const whatLangToUpper = (language) => {
     }
 }
 
-// запись языка в localStorage перед уходом --------------------------------------------------------------------
-function setLocalStorage() {
+const outputForCaps = (language) => {
+    if (language === 'en') {
+        getRows(keys.enKeyLowerCaseFirstRow, 'first-row');
+        getRows(keys.enKeyUpperCaseSecondRow, 'second-row');
+        getRows(keys.enKeyUpperCaseThirdRow, 'third-row');
+        getRows(keys.enKeyUpperCaseFourthRow, 'fourth-row');
+        document.querySelector('#Backquote').textContent = '`';
+    } else {
+        getRows(keys.enKeyLowerCaseFirstRow, 'first-row');
+        getRows(keys.ruKeyUpperCaseSecondRow, 'second-row');
+        getRows(keys.ruKeyUpperCaseThirdRow, 'third-row');
+        getRows(keys.ruKeyUpperCaseFourthRow, 'fourth-row');
+        document.querySelector('#Backquote').textContent = 'Ё';
+    }
+}
+
+// запись языка в localStorage перед уходом --------------------------------------------------------------------РАБОТАЕТ
+const setLocalStorage = () => {
     localStorage.setItem('language', language);
 }
 
 window.addEventListener('beforeunload', setLocalStorage);
 
-// нажатие на кнопку на физической клавиатуре подсвечивает кнопку на виртуальной --------------------------------------------------------------------
+// нажатие на кнопку на физической клавиатуре подсвечивает кнопку на виртуальной -------------------------------РАБОТАЕТ
 const keyDownEvent = (event) => {
-    event.preventDefault(); //для прерывания событий нажатия
-    if (event) {
-        document.querySelector(`#${event.code}`).classList.toggle('active');
+    event.preventDefault();
+    document.querySelector(`#${event.code}`).classList.toggle('active');
+    if (event.key === 'Shift') {
+        outputUpperCase(language);
     }
+    textarea.selectionStart = cursorPosition;
 }
 
 document.addEventListener('keydown', keyDownEvent);
 
-
-// отмена подсветки нажатия на кнопку --------------------------------------------------------------------
+// отмена подсветки нажатия на кнопку ---------------------------------------------------------------------ДОБАВИТЬ ШИФТ
 const keyUpEvent = (event) => {
-    event.preventDefault(); //для прерывания событий нажатия
+    event.preventDefault();
     if (event && !keysForShortcuts.includes(event.code)) {
         document.querySelector(`#${event.code}`).classList.remove('active');
     }
-
-    // вывод текста в textarea, РАЗОБРАТЬСЯ С КУРСОРОМ
-    if (event && !keysNotForPrint.includes(event.code)) {
-        textareaText.push(event.key);
+    if (event.code === 'Tab') {
+        textareaText.splice(cursorPosition, 0, '\t');
+        cursorPosition += 1;
         textarea.textContent = textareaText.join('');
-        // textarea.textContent += event.key;
+    }
+    (document.querySelector('#CapsLock').classList.contains('active')) ? outputForCaps(language) : outputLowerCase(language);
+    if (event.code === 'Enter') {
+        textareaText.splice(cursorPosition, 0, '\n');
+        cursorPosition += 1;
+    }
+    if (event.code === 'Space') {
+        textareaText.splice(cursorPosition, 0, ' ');
+        cursorPosition += 1;
+        textarea.textContent = textareaText.join('');
+    }
+    if (event.code === 'Backspace') {
+        textareaText.splice(cursorPosition - 1, 1);
+        textarea.textContent = textareaText.join('');
+        if (cursorPosition === 0) {
+            cursorPosition = 0;
+        } else {
+            cursorPosition--;
+        }
+    }
+    if (event.code === 'Delete') {
+        textareaText.splice(cursorPosition, 1);
+        textarea.textContent = textareaText.join('');
     }
 
-    //ПОДУМАТЬ
-    console.log(event.code);
-    if (document.querySelector('#CapsLock').classList.contains('active')) {
-        whatLangToUpper(language);
-    } else {
-        whatLang(language);
+    if (document.querySelector('#ShiftLeft').classList.contains('active') || document.querySelector('#ShiftRight').classList.contains('active')) {
+        document.querySelector('#ShiftRight').classList.remove('active');
+        document.querySelector('#ShiftLeft').classList.remove('active');
+        outputLowerCase(language);
     }
+
+
+//смена языка
+    if (event.key === 'Shift' && event.altKey) {
+        language = (language === 'en') ? 'ru' : 'en';
+        localStorage['language'] = language;
+        (document.querySelector('#CapsLock').classList.contains('active')) ? outputForCaps(language) : outputLowerCase(language);
+        document.querySelector('#AltLeft').classList.remove('active');
+    }
+    
+    if (event && !keysNotForKeyboardPrint.includes(event.code)) {
+        textareaText.splice(cursorPosition, 0, document.querySelector(`#${event.code}`).innerHTML);
+        cursorPosition++;
+        textarea.textContent = textareaText.join('');
+    }
+    textarea.focus();
+    textarea.selectionStart = cursorPosition;
 }
 
 document.addEventListener('keyup', keyUpEvent);
 
 
-// вывод текста при нажатии на кнопки --------------------------------------------------------------------
+// Действия при нажатиях на кнопки --------------------------------------------------------------------
+
+let cursorPosition = textarea.selectionStart;
+textarea.addEventListener('click', () => {
+    cursorPosition = textarea.selectionStart;
+});
+
+
 const printText = (event) => {
     if (event && !keysNotForPrint.includes(event.target.id)) {
-        textareaText.push(event.target.innerText);
-        // textarea.textContent += event.target.innerText;
+        textareaText.splice(cursorPosition, 0, event.target.innerText);
+        cursorPosition++;
     }
     if (event.target.id === 'Space') {
         textareaText.push(' ');
-        // textarea.textContent += ' ';
     }
     textarea.textContent = textareaText.join('');
 }
 
-keyboardContainer.addEventListener('click', printText);
-
 // залипание/отлипание shift, ctrl, alt, caps
-
 const getKeysForShortcuts = (event) => {
     if (keysForShortcuts.includes(event.target.id) && event.target.id !== 'ShiftLeft' && event.target.id !== 'ShiftRight' && event.target.id !== 'CapsLock') {
         document.querySelector(`#${event.target.id}`).classList.toggle('active');
     }
+    console.log('getKeysForShortcuts', textareaText);
     // поведение при нажатом CapsLock и Shift - ЕЩЕ ПОДУМАТЬ
-    // if ((event.target.id === 'ShiftLeft' || event.target.id === 'ShiftRight') && document.querySelector('#CapsLock').classList.contains('active')) {
-    //     whatLang(language);
-    // } else if (document.querySelector('#CapsLock').classList.contains('active')) {
-    //     whatLangToUpper(language);
-    // } else {
-    //     whatLang(language);
-    // }
+
 }
 
-// вывод заглавных букв по нажатию Shift
 const shiftPress = (event) => {
-
-    // вывод строчный букв по нажатию любой кнопки после Shift
     if (event.target.id !== 'ShiftLeft' && event.target.id !== 'ShiftRight' && !document.querySelector('#CapsLock').classList.contains('active')) {
         document.querySelector('#ShiftLeft').classList.remove('active');
         document.querySelector('#ShiftRight').classList.remove('active');
-        whatLang(language);
+        outputLowerCase(language);
     }
-
     if (event.target.id === 'ShiftLeft' || event.target.id === 'ShiftRight') {
         document.querySelector(`#${event.target.id}`).classList.toggle('active');
         if (document.querySelector(`#${event.target.id}`).classList.contains('active')) {
-            whatLangToUpper(language);
+            outputUpperCase(language);
         } else {
-            whatLang(language);
+            outputLowerCase(language);
         }
     }
+    console.log('shiftPress', textareaText);
 }
 
-// все заглавные буквы по нажатию CapsLock
 const capsPress = (event) => {
     if (event.target.id === 'CapsLock') {
         document.querySelector('#CapsLock').classList.toggle('active');
-        if (document.querySelector('#CapsLock').classList.contains('active')) {
-            whatLangToUpper(language);
-        } else {
-            whatLang(language);
-        }
+        (document.querySelector('#CapsLock').classList.contains('active')) ? outputForCaps(language) : outputLowerCase(language);
     }
 }
 
 const enterPress = (event) => {
     if (event.target.id === 'Enter') {
         textareaText.push('\n');
-        // textarea.textContent += '\n';
     }
 }
 
-// const keysNotForPrint = ['ControlLeft', 'ControlRight', 'ShiftLeft', 'ShiftRight', 'AltLeft', 'AltRight', 'CapsLock', 'Tab', 'Backspace', 'Enter', 'Delete', 'ArrowUp', 'ArrowLeft', 'ArrowRight', 'ArrowDown'];
-const BackspacePress = (event) => {
+const backspacePress = (event) => {
     if (event.target.id === 'Backspace') {
-        console.log(textareaText.length);
-        textareaText.pop();
+        textareaText.splice(cursorPosition - 1, 1);
+        textarea.textContent = textareaText.join('');
+
+        if (cursorPosition === 0) {
+            cursorPosition = 0;
+        } else {
+            cursorPosition--;
+        }
+    }
+}
+
+const del = (event) => {
+    if (event.target.id === 'Delete') {
+        console.log(textareaText);
+        // textareaText.splice(cursorPosition, 1);
+        // textarea.textContent = textareaText.join('');
     }
 }
 
 const tabPress = (event) => {
     if (event.target.id === 'Tab') {
-        textareaText.push('  ');
+        textareaText.splice(cursorPosition, 0, '   ');
+        cursorPosition += 3;
     }
 }
-let strForLang = '';
+
 const changeLang = (event) => {
-    if (event.target.id === 'ControlLeft' ||
-        event.target.id === 'AltLeft' ||
-        event.target.id === 'ControlRight' ||
-        event.target.id === 'AltRight') {
-        strForLang += event.target.id;
+    if (event.target.innerText === 'shift' || event.target.innerText === 'alt') {
+        strForLang += event.target.innerText;
     } else {
         strForLang = '';
     }
-    switch (strForLang) {
-        case 'ControlLeftAltLeft':
-        case 'AltLeftControlLeft':
-        case 'ControlRightAltRight':
-        case 'AltRightControlRight':
-        case 'ControlLeftAltRight':
-        case 'ControlRightAltLeft':
-        case 'AltLeftControlRight':
-        case 'AltRightControlLeft':
-            strForLang = '';
-            language = (language === 'en') ? 'ru' : 'en';
-            localStorage['language'] = language;
-            whatLang(language);
-            document.querySelector('#ControlLeft').classList.remove('active');
-            document.querySelector('#ControlRight').classList.remove('active');
-            document.querySelector('#AltLeft').classList.remove('active');
-            document.querySelector('#AltRight').classList.remove('active');
+    if (strForLang === 'shiftalt' || strForLang === 'altshift') {
+        strForLang = '';
+        language = (language === 'en') ? 'ru' : 'en';
+        localStorage['language'] = language;
+        (document.querySelector('#CapsLock').classList.contains('active')) ? outputForCaps(language) : outputLowerCase(language);
+        document.querySelector('#AltLeft').classList.remove('active');
+        document.querySelector('#AltRight').classList.remove('active');
     }
 }
 
-//const keysForShortcuts = ['ControlLeft', 'ControlRight', 'ShiftLeft', 'ShiftRight', 'AltLeft', 'AltRight', 'CapsLock'];
-
+keyboardContainer.addEventListener('click', printText);
 keyboardContainer.addEventListener('click', getKeysForShortcuts);
 keyboardContainer.addEventListener('click', shiftPress);
 keyboardContainer.addEventListener('click', capsPress);
 keyboardContainer.addEventListener('click', enterPress);
-keyboardContainer.addEventListener('click', BackspacePress);
+keyboardContainer.addEventListener('click', backspacePress);
 keyboardContainer.addEventListener('click', tabPress);
 keyboardContainer.addEventListener('click', changeLang);
+keyboardContainer.addEventListener('click', del);
 
 
