@@ -2,7 +2,7 @@
   "name": "virtual-keyboard",
   "version": "1.0.0",
   "description": "",
-  "main": "src/object.js",
+  "main": "src/script.js",
   "scripts": {
     "lint": "eslint ./src",
     "lint:fix": "eslint ./src --fix"
