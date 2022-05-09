@@ -422,7 +422,9 @@ window.addEventListener('beforeunload', setLocalStorage);
 
 const keyDownEvent = (event) => {
   event.preventDefault();
-  document.querySelector(`#${event.code}`).classList.toggle('active');
+  if (document.querySelector(`#${event.code}`)) {
+    document.querySelector(`#${event.code}`).classList.toggle('active');
+  }
   textarea.selectionStart = cursorPosition;
 };
 
@@ -431,7 +433,9 @@ document.addEventListener('keydown', keyDownEvent);
 const keyUpEvent = (event) => {
   event.preventDefault();
   if (event && !keysForShortcuts.includes(event.code)) {
-    document.querySelector(`#${event.code}`).classList.remove('active');
+    if (document.querySelector(`#${event.code}`)) {
+      document.querySelector(`#${event.code}`).classList.remove('active');
+    }
   }
   if (event.code === 'Tab') {
     textareaText.splice(cursorPosition, 0, '\t');
@@ -493,7 +497,9 @@ const keyUpEvent = (event) => {
         outputLowerCase(language);
       }
     } else {
-      textareaText.splice(cursorPosition, 0, document.querySelector(`#${event.code}`).innerHTML);
+      if (document.querySelector(`#${event.code}`)) {
+        textareaText.splice(cursorPosition, 0, document.querySelector(`#${event.code}`).innerHTML);
+      }
     }
     cursorPosition += 1;
     textarea.textContent = textareaText.join('');
