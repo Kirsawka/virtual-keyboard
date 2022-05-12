@@ -451,7 +451,9 @@ const keyUpEvent = (event) => {
     outputUpperCase(language);
   }
   if (event.code === 'Enter') {
+    cursorPosition += 1;
     textareaText.splice(cursorPosition, 0, '\n');
+    textarea.textContent = textareaText.join('');
     cursorPosition += 1;
   }
   if (event.code === 'Space') {
@@ -516,91 +518,92 @@ textarea.addEventListener('click', () => {
 
 const printText = (event) => {
   textarea.focus();
+  if (event.target.id) {
+    if (keysForShortcuts.includes(event.target.id) && event.target.id !== 'ShiftLeft' && event.target.id !== 'ShiftRight' && event.target.id !== 'CapsLock') {
+      document.querySelector(`#${event.target.id}`).classList.toggle('active');
+    }
 
-  if (keysForShortcuts.includes(event.target.id) && event.target.id !== 'ShiftLeft' && event.target.id !== 'ShiftRight' && event.target.id !== 'CapsLock') {
-    document.querySelector(`#${event.target.id}`).classList.toggle('active');
-  }
+    if (event && !keysNotForPrint.includes(event.target.id)) {
+      textareaText.splice(cursorPosition, 0, event.target.innerText);
+      cursorPosition += 1;
+    }
 
-  if (event && !keysNotForPrint.includes(event.target.id)) {
-    textareaText.splice(cursorPosition, 0, event.target.innerText);
-    cursorPosition += 1;
-  }
+    if (event.target.id === 'Space') {
+      textareaText.splice(cursorPosition, 0, ' ');
+      cursorPosition += 1;
+      textarea.textContent = textareaText.join('');
+    }
 
-  if (event.target.id === 'Space') {
-    textareaText.splice(cursorPosition, 0, ' ');
-    cursorPosition += 1;
-    textarea.textContent = textareaText.join('');
-  }
-
-  if (event.target.id !== 'ShiftLeft' && event.target.id !== 'ShiftRight' && !capsLock.classList.contains('active')) {
-    shiftLeft.classList.remove('active');
-    shiftRight.classList.remove('active');
-    outputLowerCase(language);
-  }
-  if (event.target.id === 'ShiftLeft' || event.target.id === 'ShiftRight') {
-    document.querySelector(`#${event.target.id}`).classList.toggle('active');
-    if (document.querySelector(`#${event.target.id}`).classList.contains('active')) {
-      outputUpperCase(language);
-    } else {
+    if (event.target.id !== 'ShiftLeft' && event.target.id !== 'ShiftRight' && !capsLock.classList.contains('active')) {
+      shiftLeft.classList.remove('active');
+      shiftRight.classList.remove('active');
       outputLowerCase(language);
     }
-  }
-
-  if (event.target.id === 'CapsLock') {
-    capsLock.classList.toggle('active');
-    if (capsLock.classList.contains('active')) {
-      outputForCaps(language);
-    } else {
-      outputLowerCase(language);
+    if (event.target.id === 'ShiftLeft' || event.target.id === 'ShiftRight') {
+      document.querySelector(`#${event.target.id}`).classList.toggle('active');
+      if (document.querySelector(`#${event.target.id}`).classList.contains('active')) {
+        outputUpperCase(language);
+      } else {
+        outputLowerCase(language);
+      }
     }
-  }
 
-  if (event.target.id === 'Enter') {
-    textareaText.splice(cursorPosition, 0, '\n');
-    cursorPosition += 1;
-  }
-
-  if (event.target.id === 'Backspace') {
-    textareaText.splice(cursorPosition - 1, 1);
-    textarea.textContent = textareaText.join('');
-
-    if (cursorPosition === 0) {
-      cursorPosition = 0;
-    } else {
-      cursorPosition += -1;
+    if (event.target.id === 'CapsLock') {
+      capsLock.classList.toggle('active');
+      if (capsLock.classList.contains('active')) {
+        outputForCaps(language);
+      } else {
+        outputLowerCase(language);
+      }
     }
-  }
 
-  if (event.target.id === 'Delete') {
-    textareaText.splice(cursorPosition, 1);
-    textarea.textContent = textareaText.join('');
-  }
-
-  if (event.target.id === 'Tab') {
-    textareaText.splice(cursorPosition, 0, '\t');
-    cursorPosition += 1;
-    textarea.textContent = textareaText.join('');
-  }
-  if (event.target.innerText === 'shift' || event.target.innerText === 'alt') {
-    strForLang += event.target.innerText;
-  } else {
-    strForLang = '';
-  }
-  if (strForLang === 'shiftalt' || strForLang === 'altshift') {
-    strForLang = '';
-    language = (language === 'en') ? 'ru' : 'en';
-    localStorage.language = language;
-    if (capsLock.classList.contains('active')) {
-      outputForCaps(language);
-    } else {
-      outputLowerCase(language);
+    if (event.target.id === 'Enter') {
+      textareaText.splice(cursorPosition, 0, '\n');
+      cursorPosition += 1;
     }
-    altLeft.classList.remove('active');
-    altRight.classList.remove('active');
-  }
 
-  textarea.textContent = textareaText.join('');
-  textarea.selectionStart = cursorPosition;
+    if (event.target.id === 'Backspace') {
+      textareaText.splice(cursorPosition - 1, 1);
+      textarea.textContent = textareaText.join('');
+
+      if (cursorPosition === 0) {
+        cursorPosition = 0;
+      } else {
+        cursorPosition += -1;
+      }
+    }
+
+    if (event.target.id === 'Delete') {
+      textareaText.splice(cursorPosition, 1);
+      textarea.textContent = textareaText.join('');
+    }
+
+    if (event.target.id === 'Tab') {
+      textareaText.splice(cursorPosition, 0, '\t');
+      cursorPosition += 1;
+      textarea.textContent = textareaText.join('');
+    }
+    if (event.target.innerText === 'shift' || event.target.innerText === 'alt') {
+      strForLang += event.target.innerText;
+    } else {
+      strForLang = '';
+    }
+    if (strForLang === 'shiftalt' || strForLang === 'altshift') {
+      strForLang = '';
+      language = (language === 'en') ? 'ru' : 'en';
+      localStorage.language = language;
+      if (capsLock.classList.contains('active')) {
+        outputForCaps(language);
+      } else {
+        outputLowerCase(language);
+      }
+      altLeft.classList.remove('active');
+      altRight.classList.remove('active');
+    }
+
+    textarea.textContent = textareaText.join('');
+    textarea.selectionStart = cursorPosition;
+  }
 };
 
 keyboardContainer.addEventListener('click', printText);
